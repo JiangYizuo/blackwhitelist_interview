@@ -74,7 +74,6 @@ bool whiteblacklist::add_to_list(uint64_t start, uint64_t end, int toWhite){
 }
 
 void whiteblacklist::add_segments(const vector< pair<segment_t, int> > &new_segs, int count){
-    const vector< pair<segment_t, int> >::iterator it;
     for(int i=0; i<count; i++){
         seg_map.insert(new_segs[i]);
     }
