@@ -98,7 +98,7 @@ whiteblacklist::wblist_ret_t whiteblacklist::remove(uint64_t start){
                 it = seg_map.find(seg_next_s);
                 if(it!=seg_map.end()){
                     if(it->second == BLANK){
-                        seg.end = it->first.end;// == SAME_AS_START?it->first.start:it->first.end;
+                        seg.end = it->first.end;
                         seg_map.erase(it);
                     }
                 }
