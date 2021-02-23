@@ -1,6 +1,6 @@
 # blackwhitelist_interview
 单元测试运行结果
-
+<br>
 Try to add segment [14, 16] WHITE
 before:
 [empty]
@@ -388,3 +388,4 @@ BLACK[1,50]
 
 Success: 3 tests passed.
 Test time: 0.00 seconds.
+/<br>
