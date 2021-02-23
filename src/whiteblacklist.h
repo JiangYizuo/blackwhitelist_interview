@@ -4,8 +4,29 @@
 #include<vector>
 #include<inttypes.h>
 
-#define WBLIST_SAME_AS_START 0
-typedef class whiteblacklist{
+class whiteblacklist{
+public:
+    typedef enum{
+        BLACK,
+        WHITE,
+        BLANK
+    }seg_type_t;
+    typedef enum{
+        SEG_ADDED,
+        SEG_INVALIED,
+        SEG_REMOVED,
+        NOT_FOUND,
+        IN_WHITE_LIST,
+        IN_BLACK_LIST,
+    }wblist_ret_t;
+
+    whiteblacklist();
+    void print_all_segments();
+    wblist_ret_t query(uint64_t number);
+    wblist_ret_t add(uint64_t start, uint64_t end, seg_type_t type);
+    wblist_ret_t remove(uint64_t start);
+private:
+    static const uint64_t SAME_AS_START = 0;
     typedef struct segment{
         uint64_t start;
         uint64_t end;
@@ -15,26 +36,21 @@ typedef class whiteblacklist{
             if(seg.start == seg.end)
                 return seg.start < start;
             if(start == end){
-                if(seg.end != WBLIST_SAME_AS_START)
+                if(seg.end != SAME_AS_START)
                     return start > seg.end;
                 else
                     return start != seg.start;
             }
             //添加新区间的比较
-            if(seg.start < start)
+            if(start > seg.start)
                 return true;
-            if(seg.start == start)
-                return seg.end < end;
+            if(start == seg.start)
+                return end > seg.end;
             return false;
         }
     }segment_t;
-    typedef std::map <segment_t, int>::iterator seg_it_t;
-    std::map <segment_t, int> seg_map;
-    void add_segments(const std::vector< std::pair<segment_t, int> > &new_segs, int count);
-public:
-    void print_all_segments();
-    bool is_in_whitelist(uint64_t number);
-    bool add_to_list(uint64_t start, uint64_t end, int toWhite);
-}whiteblacklist_t;
-
+    typedef std::map <segment_t, seg_type_t>::iterator seg_it_t;
+    std::map <segment_t, seg_type_t> seg_map;
+    void add_segments(const std::vector< std::pair<segment_t, seg_type_t> > &new_segs, int count);
+};
 #endif /* WHITEBLACKLIST_H_ */
