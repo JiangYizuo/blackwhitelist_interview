@@ -134,6 +134,8 @@ whiteblacklist::wblist_ret_t whiteblacklist::query(uint64_t start, uint64_t end)
     segment_t seg = {start, end};
     seg_it_t it = seg_map.find(seg);
     if(it != seg_map.end()){
+        if(start<it->first.start || end > it->first.end)
+            return NOT_FOUND;
         return it->second == WHITE ? IN_WHITE_LIST:
                 it->second == BLACK ? IN_BLACK_LIST:NOT_FOUND;
     }

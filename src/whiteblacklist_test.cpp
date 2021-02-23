@@ -57,7 +57,14 @@ TEST(abnormal){
     whiteblacklist wblist;
     TEST_ADD(14, 16, WHITE, SEG_ADDED);
     TEST_ADD(15, 15, BLACK, SEG_ADDED);
-    wblist.query(15);
+    CHECK_EQUAL(wblist.query(14, 15), whiteblacklist::NOT_FOUND);
+    CHECK_EQUAL(wblist.query(13, 14), whiteblacklist::NOT_FOUND);
+    CHECK_EQUAL(wblist.query(13, 15), whiteblacklist::NOT_FOUND);
+    CHECK_EQUAL(wblist.query(13, 16), whiteblacklist::NOT_FOUND);
+    CHECK_EQUAL(wblist.query(13, 17), whiteblacklist::NOT_FOUND);
+    CHECK_EQUAL(wblist.query(0, 14), whiteblacklist::NOT_FOUND);
+    CHECK_EQUAL(wblist.query(0, 15), whiteblacklist::NOT_FOUND);
+    CHECK_EQUAL(wblist.query(0, 17), whiteblacklist::NOT_FOUND);
     TEST_ADD(2, 2, BLACK, SEG_ADDED);
     TEST_ADD(2, 2, BLACK, SEG_ADDED);
 
