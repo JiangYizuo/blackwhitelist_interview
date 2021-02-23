@@ -45,7 +45,6 @@ whiteblacklist::wblist_ret_t whiteblacklist::add(uint64_t start, uint64_t end, s
             if(type != old_type){
                 //拆分区间
                 WBLIST_ADD_NEW_SEG(seg.start, start-1, old_type);
-
                 if(seg.end > end){
                     WBLIST_ADD_NEW_SEG(end+1, seg.end, old_type);
                 }
@@ -53,12 +52,10 @@ whiteblacklist::wblist_ret_t whiteblacklist::add(uint64_t start, uint64_t end, s
                 //合并区间
                 seg_merged.start = seg.start;
                 if(seg.end >= end){
+                    seg_merged.end = seg.end;
                     break;
                 }
-                //WBLIST_ADD_NEW_SEG(seg.start, end, it->second);
-//                merged = true;
             }
-
         }else if(seg.start <= end){
             if(seg.end > end)
             {
@@ -87,6 +84,27 @@ whiteblacklist::wblist_ret_t whiteblacklist::remove(uint64_t start){
         if(it->first.start == start && it->second != BLANK){
             segment_t seg;
             WBLIST_GET_SEG_FROM_IT(it, seg);
+            seg_map.erase(it);
+            if(start>1){
+                segment_t seg_pre_s = {start-1, start-1};
+                it = seg_map.find(seg_pre_s);
+                if(it!=seg_map.end()){
+                    if(it->second == BLANK){
+                        seg.start = it->first.start;
+                        seg_map.erase(it);
+                    }
+                }
+            }
+            if(seg.end<(uint64_t)-1){
+                segment_t seg_next_s = {seg.end+1, seg.end+1};
+                it = seg_map.find(seg_next_s);
+                if(it!=seg_map.end()){
+                    if(it->second == BLANK){
+                        seg.end = it->first.end == SAME_AS_START?it->first.start:it->first.end;
+                        seg_map.erase(it);
+                    }
+                }
+            }
             add(seg.start, seg.end, BLANK);
             return SEG_REMOVED;
         }
@@ -120,12 +138,13 @@ void whiteblacklist::print_all_segments()
         cout<<"[empty]"<<endl;
         return;
     }
+    /*
     if(it->second == BLANK){
         if(it->first.start == 1 && it->first.end == uint64_t(-1) && it->second == BLANK){
             cout<<"[empty]"<<endl;
             return;
         }
-    }
+    }*/
     while(it != seg_map.end()){
        // if(it->second != BLANK)
             cout<<segname[it->second]
