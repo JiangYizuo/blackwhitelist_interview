@@ -23,29 +23,18 @@ public:
     whiteblacklist();
     void print_all_segments();
     wblist_ret_t query(uint64_t number);
+    wblist_ret_t query(uint64_t start, uint64_t end);
     wblist_ret_t add(uint64_t start, uint64_t end, seg_type_t type);
     wblist_ret_t remove(uint64_t start);
 private:
-    static const uint64_t SAME_AS_START = 0;
     typedef struct segment{
         uint64_t start;
         uint64_t end;
         bool operator < (segment const & seg) const
         {
-            //匹配区间时的比较
-            if(seg.start == seg.end)
-                return seg.start < start;
-            if(start == end){
-                if(seg.end != SAME_AS_START)
-                    return start > seg.end;
-                else
-                    return start != seg.start;
-            }
-            //添加新区间的比较
-            if(start > seg.start)
+            //拆分，合并区间完成, 可以保证插入新区间不会重叠，因此简化
+            if(start < seg.start && end < seg.end)
                 return true;
-            if(start == seg.start)
-                return end > seg.end;
             return false;
         }
     }segment_t;

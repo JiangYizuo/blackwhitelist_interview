@@ -5,13 +5,13 @@ using namespace std;
 #define WBLIST_GET_SEG_FROM_IT(__it, __seg) \
         do{ \
             (__seg).start = (__it)->first.start; \
-            (__seg).end = (__it)->first.end == SAME_AS_START ? (__it)->first.start : (__it)->first.end;\
+            (__seg).end = (__it)->first.end; \
         }while(0)
 
 #define WBLIST_PRE_DEL(__it) seg_map.erase(__it++)
 
 whiteblacklist::whiteblacklist(){
-    add(1, uint64_t(-1), BLANK);
+    add(0, uint64_t(-1), BLANK);
 }
 
 whiteblacklist::wblist_ret_t whiteblacklist::add(uint64_t start, uint64_t end, seg_type_t type){
@@ -19,14 +19,14 @@ whiteblacklist::wblist_ret_t whiteblacklist::add(uint64_t start, uint64_t end, s
     do{\
         segment_t new_seg; \
         new_seg.start = (__start); \
-        new_seg.end = (__start) == (__end)?SAME_AS_START:(__end); \
+        new_seg.end = (__end); \
         new_segs.push_back(make_pair(new_seg, __type)); \
         new_segs_cnt++; \
     }while(0)
-    if(start > end || start == SAME_AS_START || end == SAME_AS_START)
+    if(start > end)
         return SEG_INVALIED;
-    segment_t seg_e = {end, end};
-    seg_it_t it = seg_map.find(seg_e);
+    segment_t seg_s = {start, start};
+    seg_it_t it = seg_map.find(seg_s);
     vector< pair<segment_t, seg_type_t> > new_segs;
     uint64_t new_segs_cnt = 0;
     segment_t seg_merged = {start, end};
@@ -76,8 +76,6 @@ whiteblacklist::wblist_ret_t whiteblacklist::add(uint64_t start, uint64_t end, s
 }
 
 whiteblacklist::wblist_ret_t whiteblacklist::remove(uint64_t start){
-    if(start == SAME_AS_START)
-        return SEG_INVALIED;
     segment_t seg_s = {start, start};
     seg_it_t it = seg_map.find(seg_s);
     if(it != seg_map.end()){
@@ -85,7 +83,7 @@ whiteblacklist::wblist_ret_t whiteblacklist::remove(uint64_t start){
             segment_t seg;
             WBLIST_GET_SEG_FROM_IT(it, seg);
             seg_map.erase(it);
-            if(start>1){
+            if(start>0){
                 segment_t seg_pre_s = {start-1, start-1};
                 it = seg_map.find(seg_pre_s);
                 if(it!=seg_map.end()){
@@ -100,7 +98,7 @@ whiteblacklist::wblist_ret_t whiteblacklist::remove(uint64_t start){
                 it = seg_map.find(seg_next_s);
                 if(it!=seg_map.end()){
                     if(it->second == BLANK){
-                        seg.end = it->first.end == SAME_AS_START?it->first.start:it->first.end;
+                        seg.end = it->first.end;// == SAME_AS_START?it->first.start:it->first.end;
                         seg_map.erase(it);
                     }
                 }
@@ -130,6 +128,18 @@ whiteblacklist::wblist_ret_t whiteblacklist::query(uint64_t number){
     return NOT_FOUND;
 }
 
+whiteblacklist::wblist_ret_t whiteblacklist::query(uint64_t start, uint64_t end){
+    if(start > end)
+        return SEG_INVALIED;
+    segment_t seg = {start, end};
+    seg_it_t it = seg_map.find(seg);
+    if(it != seg_map.end()){
+        return it->second == WHITE ? IN_WHITE_LIST:
+                it->second == BLACK ? IN_BLACK_LIST:NOT_FOUND;
+    }
+    return NOT_FOUND;
+}
+
 void whiteblacklist::print_all_segments()
 {
     seg_it_t it = seg_map.begin();
@@ -138,18 +148,11 @@ void whiteblacklist::print_all_segments()
         cout<<"[empty]"<<endl;
         return;
     }
-    /*
-    if(it->second == BLANK){
-        if(it->first.start == 1 && it->first.end == uint64_t(-1) && it->second == BLANK){
-            cout<<"[empty]"<<endl;
-            return;
-        }
-    }*/
     while(it != seg_map.end()){
        // if(it->second != BLANK)
             cout<<segname[it->second]
                         <<"["<<it->first.start<<","
-                        <<(it->first.end == SAME_AS_START?it->first.start:it->first.end)
+                        <<it->first.end
                         <<"]"<<endl;
         it++;
     }

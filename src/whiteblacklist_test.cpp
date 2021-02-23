@@ -16,6 +16,13 @@ using namespace std;
     do{\
         for(uint64_t i=__start; i<=__end; i++) \
             CHECK_EQUAL(wblist.query(i), whiteblacklist::__exp);\
+        CHECK_EQUAL(wblist.query(__start, __end), whiteblacklist::__exp);\
+        for(int i=0; i< (__end-__start); i++)\
+            CHECK_EQUAL(wblist.query(__start+i, __end), whiteblacklist::__exp);\
+        for(int i=0; i< (__end-__start); i++)\
+            CHECK_EQUAL(wblist.query(__start, __end-i), whiteblacklist::__exp);\
+        for(int i=0; i< (__end-__start)>>1; i++)\
+            CHECK_EQUAL(wblist.query(__start+i, __end-i), whiteblacklist::__exp);\
     }while(0)
 
 #define TEST_ADD(__start, __end, __type, __exp) \
@@ -54,14 +61,14 @@ TEST(abnormal){
     TEST_ADD(2, 2, BLACK, SEG_ADDED);
     TEST_ADD(2, 2, BLACK, SEG_ADDED);
 
-    TEST_ADD(0, 2, WHITE, SEG_INVALIED);
-    TEST_QUERY(2, 2, IN_BLACK_LIST);
+    TEST_ADD(0, 2, WHITE, SEG_ADDED);
+    TEST_QUERY(2, 2, IN_WHITE_LIST);
 
     TEST_ADD(2, 0, WHITE, SEG_INVALIED);
-    TEST_QUERY(2, 2, IN_BLACK_LIST);
+    TEST_QUERY(2, 2, IN_WHITE_LIST);
 
     TEST_ADD(2, 1, WHITE, SEG_INVALIED);
-    TEST_QUERY(2, 2, IN_BLACK_LIST);
+    TEST_QUERY(2, 2, IN_WHITE_LIST);
 }
 
 TEST(remove){
